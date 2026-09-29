@@ -100,13 +100,18 @@ form{display:flex;gap:8px;margin:8px 0}
 .bq svg{width:100%;height:100%;animation:sway 1.4s ease-in-out infinite alternate}
 @keyframes fall{to{transform:translate(var(--sx),calc(100vh + 160px)) rotate(var(--r))}}
 @keyframes sway{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
-.cele{position:fixed;left:50%;top:38%;z-index:31;width:min(86vw,340px);transform:translate(-50%,-50%);text-align:center;background:#fff;border:4px solid #ffb3c6;border-radius:26px;padding:14px 16px 16px;box-shadow:0 14px 40px rgba(255,92,138,.4);pointer-events:none;animation:celeIn .5s cubic-bezier(.2,1.4,.4,1),celeOut .5s ease 3.2s forwards;color:#2b2b3a}
+.cele{position:fixed;left:50%;top:38%;z-index:31;width:min(86vw,340px);transform:translate(-50%,-50%);text-align:center;background:#fff;border:4px solid #ffb3c6;border-radius:26px;padding:14px 16px 16px;box-shadow:0 14px 40px rgba(255,92,138,.4);pointer-events:none;animation:celeIn .5s cubic-bezier(.2,1.4,.4,1),celeOut .5s ease 5.2s forwards;color:#2b2b3a}
 .cele svg{width:96px;height:114px;animation:bob 1s ease-in-out infinite}
 .cele b{display:block;font-size:22px;line-height:1.35;color:#e0457b}
 .cele span{display:block;margin-top:4px;font-size:15px}
 @keyframes celeIn{from{transform:translate(-50%,-50%) scale(.3);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 @keyframes celeOut{to{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
 @media (max-width:380px){.lv .mini{width:70px;height:70px}h1{font-size:28px}.bubble{font-size:28px}}
+.cele .cshare{display:inline-block;margin-top:10px;pointer-events:auto;cursor:pointer;border:0;border-radius:999px;background:#ff5c8a;color:#fff;font:inherit;font-size:15px;font-weight:700;padding:9px 18px;box-shadow:0 4px 0 #d9457a}
+.cele .cshare:active{transform:translateY(2px);box-shadow:0 2px 0 #d9457a}
+.overlay .sbtns{display:flex;gap:10px;margin-top:14px}.overlay .sbtns button{flex:1;font-size:15px;padding:10px 6px}
+.overlay .sbtns .follow{background:#1d9bf0;color:#fff;border-color:#1d9bf0}
+#toast{position:fixed;left:50%;bottom:9%;transform:translateX(-50%);z-index:60;background:rgba(30,30,50,.92);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;max-width:88vw;text-align:center}
 </style>
 </head>
 <body class="t1">
@@ -149,6 +154,7 @@ form{display:flex;gap:8px;margin:8px 0}
     <div class="small" id="overS" style="color:var(--ink)"></div>
     <div class="big2" id="overScore">0</div>
     <div id="overInfo" style="font-size:14px"></div>
+    <div class="sbtns"><button class="big" id="overShare" type="button" style="margin:0"></button><button class="big follow" id="overFollow" type="button" style="margin:0" hidden></button></div>
     <div class="btns"><button class="ghost" id="overHome" type="button"></button><button class="big" id="overAgain" type="button" style="margin:0;font-size:18px;padding:12px"></button></div>
   </div>
 </div>
@@ -322,11 +328,38 @@ function bouquetSVG(){
   '<path d="M12 64 L50 118 L88 64 Q50 78 12 64Z" fill="#ffe9c7" stroke="#f0c9a0" stroke-width="2"/><path d="M30 72 L50 114 M70 72 L50 114" stroke="#f5d3a8" stroke-width="2"/>'+
   '<path d="M50 88 C36 78 30 92 40 94 Z M50 88 C64 78 70 92 60 94 Z" fill="#ff5c8a"/><circle cx="50" cy="90" r="5" fill="#e0457b"/><path d="M47 94 L40 108 M53 94 L60 108" stroke="#ff5c8a" stroke-width="4" stroke-linecap="round"/></svg>';
 }
+/* ============ 공유 · 팔로우 ============ */
+/* ★ 팔로우 받을 계정 주소를 여기에 넣으세요 (예: 'https://x.com/계정명'). 비워 두면 팔로우 버튼은 숨겨집니다. */
+const FOLLOW_URL='https://x.com/azabumin';
+const FOLLOW_NAME='X';
+const SH={
+ ko:{share:'📤 결과 공유하기',card:'💐 축하 카드 공유',follow:n=>`➕ ${n} 팔로우`,res:(l,n)=>`🎯 끝말잇기 ${l} ${n}점 달성! 도전해 보세요 👉`,cel:(l,n)=>`💐 끝말잇기 ${l}에서 ${n}점 달성! 같이 해 봐요 👉`,copied:'링크가 복사되었어요. 붙여넣어 공유하세요!'},
+ en:{share:'📤 Share result',card:'💐 Share card',follow:n=>`➕ Follow on ${n}`,res:(l,n)=>`🎯 Word Chain (${l}): ${n} points! Can you beat me? 👉`,cel:(l,n)=>`💐 Word Chain (${l}): reached ${n} points! Try it 👉`,copied:'Link copied! Paste it to share.'},
+ ja:{share:'📤 結果をシェア',card:'💐 お祝いカードをシェア',follow:n=>`➕ ${n}をフォロー`,res:(l,n)=>`🎯 しりとり（${l}）で${n}点！挑戦してみて 👉`,cel:(l,n)=>`💐 しりとり（${l}）で${n}点達成！いっしょに遊ぼう 👉`,copied:'リンクをコピーしました。貼り付けてシェアしてね！'},
+ zh:{share:'📤 分享成绩',card:'💐 分享庆祝卡',follow:n=>`➕ 关注${n}`,res:(l,n)=>`🎯 词语接龙（${l}）拿到${n}分！来挑战吧 👉`,cel:(l,n)=>`💐 词语接龙（${l}）达到${n}分！一起来玩 👉`,copied:'链接已复制，粘贴即可分享！'},
+ hi:{share:'📤 नतीजा शेयर करें',card:'💐 बधाई कार्ड शेयर करें',follow:n=>`➕ ${n} पर फ़ॉलो करें`,res:(l,n)=>`🎯 शब्द श्रृंखला (${l}): ${n} अंक! क्या आप हरा सकते हैं? 👉`,cel:(l,n)=>`💐 शब्द श्रृंखला (${l}): ${n} अंक पूरे! आप भी खेलिए 👉`,copied:'लिंक कॉपी हो गया! पेस्ट करके शेयर करें।'}
+};
+function toast(t){
+ let e=$('#toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e);}
+ e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true;},2600);
+}
+async function shareText(text){
+ const url=location.origin==='null'||location.protocol==='file:'?location.href:location.origin+location.pathname;
+ const S=SH[lang];
+ try{
+  if(navigator.share){await navigator.share({title:T[lang].title,text,url});return;}
+ }catch(e){if(e&&e.name==='AbortError')return;}
+ const full=text+' '+url;
+ try{await navigator.clipboard.writeText(full);toast(S.copied);return;}catch(_){}
+ try{const ta=document.createElement('textarea');ta.value=full;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast(S.copied);}
+ catch(_){window.prompt('Copy:',full);}
+}
 function celebrate(points){
  const S=T[lang],svg=bouquetSVG();
  document.querySelectorAll('.bq,.cele').forEach(e=>e.remove());
- const box=document.createElement('div');box.className='cele';box.innerHTML=svg+`<b>${S.cele(points)}</b><span>${S.celeSub}</span>`;document.body.appendChild(box);
- setTimeout(()=>box.remove(),3800);
+ const box=document.createElement('div');box.className='cele';box.innerHTML=svg+`<b>${S.cele(points)}</b><span>${S.celeSub}</span><button type="button" class="cshare">${SH[lang].card}</button>`;document.body.appendChild(box);
+ box.querySelector('.cshare').onclick=()=>shareText(SH[lang].cel(T[lang].lv[level-1],points));
+ setTimeout(()=>box.remove(),5800);
  for(let i=0;i<22;i++){const e=document.createElement('div');e.className='bq';e.innerHTML=svg;
   const sz=44+Math.random()*44;e.style.width=sz+'px';e.style.height=sz*1.19+'px';e.style.left=(Math.random()*96)+'vw';
   e.style.setProperty('--d',(2.6+Math.random()*2.4)+'s');e.style.setProperty('--sx',(Math.random()*120-60)+'px');e.style.setProperty('--r',(Math.random()*720-360)+'deg');
@@ -520,7 +553,9 @@ function gameOver(){
  $('#overChar').innerHTML=charSVG(level);$('#overChar').dataset.mood='sad';
  $('#overT').textContent=S.over;$('#overS').textContent=S.finalScore;$('#overScore').textContent=score;
  $('#overInfo').innerHTML=`${S.words}: <b>${total}</b> · ${S.best}: <b>${best}</b>${nb?'<br>'+S.newBest:''}`;
- $('#overHome').textContent=S.home;$('#overAgain').textContent=S.again;$('#over').hidden=false;
+ $('#overHome').textContent=S.home;$('#overAgain').textContent=S.again;
+ $('#overShare').textContent=SH[lang].share;$('#overFollow').textContent=SH[lang].follow(FOLLOW_NAME);$('#overFollow').hidden=!FOLLOW_URL;
+ $('#over').hidden=false;
 }
 $('#endBtn').onclick=()=>{if(!$('#game').hidden)gameOver();};
 $('#soundBtn').onclick=()=>{soundOn=!soundOn;try{localStorage.setItem('wc_sound',soundOn?'1':'0');}catch(_){}renderSound();if(!soundOn)stopSpeech();else if(cur)speak(cur.d);};
@@ -536,6 +571,8 @@ $('#passBtn').onclick=()=>{if(busy)return;msg(T[lang].passed,'bad');loseHeart(nu
 $('#homeBtn').onclick=()=>{over=true;gen++;stopSpeech();document.querySelectorAll('.bq,.cele').forEach(e=>e.remove());stopTimer();$('#game').hidden=true;$('#home').hidden=false;$('#over').hidden=true;renderHome();};
 $('#overHome').onclick=()=>$('#homeBtn').click();
 $('#overAgain').onclick=()=>startGame();
+$('#overShare').onclick=()=>shareText(SH[lang].res(T[lang].lv[level-1],score));
+$('#overFollow').onclick=()=>{if(FOLLOW_URL)window.open(FOLLOW_URL,'_blank','noopener');};
 $('#startBtn').onclick=()=>startGame();
 renderHome();tryAutoDict();
 </script>
