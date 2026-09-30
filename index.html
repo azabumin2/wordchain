@@ -129,6 +129,7 @@ form{display:flex;gap:8px;margin:8px 0}
     <div class="row"><button class="ghost" id="dictBtn" type="button"></button><span class="small" id="dictInfo"></span><input type="file" id="dictFile" accept=".txt,.csv,.tsv,.json" hidden></div>
     <button class="big" id="startBtn" type="button"></button>
     <details class="card"><summary id="rulesH"></summary><ul id="rulesT"></ul></details>
+    <p class="small" id="credit" style="text-align:center;margin:10px 0 24px" hidden></p>
   </section>
 
   <section id="game" hidden>
@@ -420,6 +421,7 @@ function renderHome(){
  $('#topicRow').innerHTML=Object.keys(S.topics).filter(k=>k==='all'||RAW[lang][k]).map(k=>`<button class="chip ${k===topic?'on':''}" data-topic="${k}" type="button">${S.topics[k]}</button>`).join('');
  $('#lenientT').textContent=S.lenient;$('#dictBtn').textContent=S.dict;
  $('#dictInfo').textContent=EXTRA[lang].length?S.dictN(EXTRA[lang].length):'';
+ $('#credit').hidden=lang!=='ko';$('#credit').innerHTML='단어 데이터: 국립국어원 <a href="https://stdict.korean.go.kr" target="_blank" rel="noopener">표준국어대사전</a> (CC BY-SA 2.0 KR)';
  $('#startBtn').textContent=S.start;$('#rulesH').textContent=S.rulesH;$('#rulesT').innerHTML=S.rules.concat([S.ruleCele]).map(r=>`<li>${r}</li>`).join('');
  setDeco();
 }
