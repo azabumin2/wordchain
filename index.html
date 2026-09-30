@@ -375,6 +375,7 @@ function checkMilestone(prev,now){
 /* ============ 5. 사전 DB ============ */
 const $=s=>document.querySelector(s);
 const EXTRA={ko:[],en:[],ja:[],zh:[],hi:[]};
+const AUTO={}; // 사전 파일(dict_xx.txt)이 자동으로 로드된 언어
 const DBS={};
 let lang='ko',level=1,topic='all',lenient=true;
 function mkEntry(raw,tg,known){
@@ -402,7 +403,7 @@ function candidates(prev){
  return out;
 }
 const followers=e=>candidates(e).length;
-const strict=()=>!(lenient&&topic==='all');
+const strict=()=>!(lenient&&!AUTO[lang]&&topic==='all');
 
 /* ============ 6. 홈 화면 ============ */
 function setDeco(){
@@ -420,9 +421,10 @@ function renderHome(){
  if(topic!=='all'&&!RAW[lang][topic])topic='all';
  $('#topicRow').innerHTML=Object.keys(S.topics).filter(k=>k==='all'||RAW[lang][k]).map(k=>`<button class="chip ${k===topic?'on':''}" data-topic="${k}" type="button">${S.topics[k]}</button>`).join('');
  $('#lenientT').textContent=S.lenient;$('#dictBtn').textContent=S.dict;
- $('#dictInfo').textContent=EXTRA[lang].length?S.dictN(EXTRA[lang].length):'';
+ $('#lenient').closest('label').hidden=!!AUTO[lang];$('#dictBtn').hidden=!!AUTO[lang];
+ $('#dictInfo').textContent=EXTRA[lang].length?(AUTO[lang]?'📖 '+S.dictN(EXTRA[lang].length):S.dictN(EXTRA[lang].length)):'';
  $('#credit').hidden=lang!=='ko';$('#credit').innerHTML='단어 데이터: 국립국어원 <a href="https://stdict.korean.go.kr" target="_blank" rel="noopener">표준국어대사전</a> (CC BY-SA 2.0 KR)';
- $('#startBtn').textContent=S.start;$('#rulesH').textContent=S.rulesH;$('#rulesT').innerHTML=S.rules.concat([S.ruleCele]).map(r=>`<li>${r}</li>`).join('');
+ $('#startBtn').textContent=S.start;$('#rulesH').textContent=S.rulesH;$('#rulesT').innerHTML=S.rules.concat([S.ruleCele]).concat(AUTO[lang]&&lang==='ko'?['📖 <b>표준국어대사전</b>에 있는 명사만 인정돼요. 사전에 없는 말은 다시 생각해 보세요!']:[]).map(r=>`<li>${r}</li>`).join('');
  setDeco();
 }
 $('#langRow').onclick=e=>{const b=e.target.closest('[data-lang]');if(!b)return;lang=b.dataset.lang;renderHome();tryAutoDict();};
@@ -438,7 +440,7 @@ async function loadWords(txt){
 $('#dictFile').onchange=async e=>{const f=e.target.files[0];if(f)await loadWords(await f.text());e.target.value='';};
 async function tryAutoDict(){ // 같은 폴더의 dict_ko.txt 등을 자동 로드 (http/https 환경)
  if(EXTRA[lang].length||location.protocol==='file:')return;
- try{const r=await fetch('dict_'+lang+'.txt');if(r.ok)await loadWords(await r.text());}catch(_){}
+ try{const r=await fetch('dict_'+lang+'.txt');if(r.ok){const t=await r.text();await loadWords(t);if(EXTRA[lang].length>1000){AUTO[lang]=true;renderHome();}}}catch(_){}
 }
 
 /* ============ 7. 게임 ============ */
