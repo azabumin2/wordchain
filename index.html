@@ -42,9 +42,9 @@ details.card summary{cursor:pointer;font-weight:700}
 details.card ul{margin:8px 0 2px;padding-left:20px;line-height:1.7;font-size:14px}
 /* game */
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-#hearts{font-size:20px;letter-spacing:1px}
-#lvBadge{font-weight:800;font-size:14px;background:var(--accent);color:#fff;border-radius:999px;padding:3px 12px}
-.sc{text-align:right;line-height:1.1}.sc b{font-size:26px}.sc small{display:block;font-size:11px;opacity:.7}
+#hearts{font-size:17px;letter-spacing:0;white-space:nowrap}
+#lvBadge{font-weight:800;font-size:14px;background:var(--accent);color:#fff;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.sc{text-align:right;line-height:1.1;white-space:nowrap}@media(max-width:360px){#hearts{font-size:13px}#lvBadge{font-size:11px;padding:3px 6px}.sc b{font-size:22px}.endTop{width:30px;height:30px;font-size:15px}}.sc b{font-size:26px}.sc small{display:block;font-size:11px;opacity:.7}
 .timer{height:10px;background:rgba(255,255,255,.7);border-radius:99px;margin:10px 0;overflow:hidden}
 .timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#5bd18b,#ffd23f);border-radius:99px}
 .timer i.low{background:linear-gradient(90deg,#ff7a59,#ff4d6d)}
@@ -71,7 +71,7 @@ form{display:flex;gap:8px;margin:8px 0}
 #inp{flex:1;min-width:0;border:3px solid var(--line);border-radius:16px;padding:13px 14px;font:inherit;font-size:20px;background:#fff;color:var(--ink)}
 #inp:focus{outline:none;border-color:var(--blue)}
 #sendBtn{border:0;border-radius:16px;padding:0 20px;font:inherit;font-size:17px;font-weight:800;color:#fff;background:var(--blue);cursor:pointer}
-.acts{justify-content:center;margin-top:6px;gap:6px}.acts .ghost{padding:9px 11px;font-size:14px}#endBtn{border-color:#ffb3b3;color:#c0392b}.bubble{cursor:pointer}
+.acts{justify-content:center;margin-top:6px;gap:6px}.acts .ghost{padding:9px 11px;font-size:14px}#endBtn{border-color:#ffb3b3;color:#c0392b}.endTop{flex:none;width:34px;height:34px;margin-left:2px;border:2px solid #ffb3b3;border-radius:50%;background:#fff;font-size:18px;line-height:1;cursor:pointer;padding:0}.bubble{cursor:pointer}
 .shake{animation:shake .4s}
 @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .overlay{position:fixed;inset:0;z-index:10;background:rgba(20,20,40,.6);display:flex;align-items:center;justify-content:center;padding:20px}
@@ -129,11 +129,12 @@ form{display:flex;gap:8px;margin:8px 0}
     <div class="row"><button class="ghost" id="dictBtn" type="button"></button><span class="small" id="dictInfo"></span><input type="file" id="dictFile" accept=".txt,.csv,.tsv,.json" hidden></div>
     <button class="big" id="startBtn" type="button"></button>
     <details class="card"><summary id="rulesH"></summary><ul id="rulesT"></ul></details>
-    <p class="small" id="credit" style="text-align:center;margin:10px 0 24px" hidden></p>
+    <p class="small" id="credit" style="text-align:center;margin:10px 0 4px" hidden></p>
+    <p class="small" style="text-align:center;margin:0 0 24px;opacity:.6">v2026.09.30-c</p>
   </section>
 
   <section id="game" hidden>
-    <div class="top card"><div id="hearts"></div><span id="lvBadge"></span><div class="sc"><b id="score">0</b><small id="bestL"></small></div></div>
+    <div class="top card"><div id="hearts"></div><span id="lvBadge"></span><div class="sc"><b id="score">0</b><small id="bestL"></small></div><button id="endTop" class="endTop" type="button" aria-label="end game">🏁</button></div>
     <div class="timer"><i id="tbar"></i></div>
     <div class="stage card" id="stage">
       <div class="char" id="char" data-mood=""></div>
@@ -561,7 +562,7 @@ function gameOver(){
  $('#overShare').textContent=SH[lang].share;$('#overFollow').textContent=SH[lang].follow(FOLLOW_NAME);$('#overFollow').hidden=!FOLLOW_URL;
  $('#over').hidden=false;
 }
-$('#endBtn').onclick=()=>{if(!$('#game').hidden)gameOver();};
+$('#endBtn').onclick=$('#endTop').onclick=()=>{if(!$('#game').hidden)gameOver();};
 $('#soundBtn').onclick=()=>{soundOn=!soundOn;try{localStorage.setItem('wc_sound',soundOn?'1':'0');}catch(_){}renderSound();if(!soundOn)stopSpeech();else if(cur)speak(cur.d);};
 $('#bubble').onclick=()=>{if(cur&&soundOn){stopSpeech();speak(cur.d);}};
 $('#form').onsubmit=e=>{e.preventDefault();submit($('#inp').value);};
